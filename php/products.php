@@ -48,13 +48,15 @@ if (array_key_exists("a", $_REQUEST)) {
 			// adding htmlentties so that no xss and real escape for validation of input for '
 		$conn = pg_connect('user='.$CONFIG['username'].
 			' dbname='.$CONFIG['database']);
+		if($_REQUEST['msrp']>=0){$price=$_REQUEST['msrp'];}// just a small check making the price always positive
+		else{$price=0;}
 		$res = pg_prepare($conn, "insert_query", "INSERT INTO products
 			(productid, productname, productdescr, msrp, imageurl)
 			VALUES
 			('".mysql_real_escape_string(htmlentities($_REQUEST['prodid']))."', '".
 			mysql_real_escape_string(htmlentities($_REQUEST['prodname']))."', ".
 			"'".mysql_real_escape_string(htmlentities($_REQUEST['proddesc']))."', ".
-			mysql_real_escape_string(htmlentities($_REQUEST['msrp'])).", ".
+			mysql_real_escape_string(htmlentities($price)).", ".
 			"'".$imgname."');");
 		
 		$result=pg_execute($conn,"insert_query"); // executing 
@@ -74,7 +76,7 @@ if (array_key_exists("a", $_REQUEST)) {
 		$res = pg_prepare($conn, "update_query", "update products ".
 			"set productname='".mysql_real_escape_string(htmlentities($_REQUEST['prodname']))."',".
 			"    productdescr='".mysql_real_escape_string(htmlentities($_REQUEST['proddesc']))."',".
-			"    msrp=".mysql_real_escape_string(htmlentities($_REQUEST['msrp'])).",".
+			"    msrp=".mysql_real_escape_string(htmlentities($price)).",".
 			"    imageurl='".$imgname."'".
 			"where productid='".$_REQUEST['prodid']."'");
 		$res = pg_execute($conn,"insert_query"); // executing 
