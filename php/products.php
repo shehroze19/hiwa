@@ -65,7 +65,7 @@ if (array_key_exists("a", $_REQUEST)) {
 		if ($_FILES['prodimg']['tmp_name'] != "" || $imgname!='hiva.png' ) { // should not have icons name
 			$imgname=$_FILES['prodimg']['name'];
 			copy($_FILES['prodimg']['tmp_name'],
-				$CONFIG['uploads'].'/'.$_FILES['prodimg']['name']);
+				$CONFIG['uploads'].'/'.$_FILES['prodimg']['name']);// same as before, we can also change the directory
 		} else {
 			$imgname='';
 		}
