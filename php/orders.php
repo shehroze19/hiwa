@@ -2,23 +2,29 @@
 require 'config.phplib';
 
 $msg="";
-if (!array_key_exists('hiwa-user', $_COOKIE) ||
-    !array_key_exists('hiwa-role', $_COOKIE)) {
+if (!isset($_SESSION['user']){ // if session is not set it will redirect to the main page
 	Header("Location: login.php");
 	exit();
 }
 
-$role=$_COOKIE['hiwa-role'];
+$role=$_SESSION['hiwa-role'];
 
 if (array_key_exists('a', $_REQUEST)) {
 $conn = pg_connect("user=".$CONFIG['username']." dbname=".$CONFIG['database']);
-$res = pg_query_params($conn, "INSERT INTO orders
+	
+	// used prepared statements and parameterized queries. These are SQL statements that are sent to
+	//and parsed by the database server separately from any parameters. This way it is 
+	//impossible for an attacker to inject malicious SQL
+	
+$res = pg_prepare($conn,"insert_query","INSERT INTO orders
 	(orderid, customerid, status)
 	VALUES ($1, $2, $3)", array( 
 		$_REQUEST['orderid'], 
 		$_REQUEST['custid'],
 		$_REQUEST['status'] ) );
-pg_free_result($res);
+$result = pg_execute($conn, "insert_query"); // separate execution
+	
+pg_free_result($result);
 pg_close($conn);	
 }
 ?>
@@ -33,7 +39,7 @@ pg_close($conn);
 <body>
 <?php require 'header.php';?>
 <div class="title">HIWA Manage Orders</div>
-<div class="subtitle">Logged in as <?php echo $_COOKIE['hiwa-user'];?>
+<div class="subtitle">Logged in as <?php echo $_SESSION['hiwa-user'];?>
 	(<?php echo $role; ?>)
 </div>
 
