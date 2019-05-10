@@ -2,7 +2,7 @@
 require 'config.phplib';
 
 $msg="";
-if (!isset($_SESSION['user']){ // if session is not set it will redirect to the main page
+if (!isset($_SESSION['user'] || !isset($_SESSION['role']){ // if session is not set it will redirect to the main page
 	Header("Location: login.php");
 	exit();
 }
