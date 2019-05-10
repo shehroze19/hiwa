@@ -11,7 +11,7 @@ if (array_key_exists('login', $_REQUEST) &&
 	// we could have also used the md5() function to encrypt the password but for that it should be stored in encrypted form in db
 	// used prepared statements and parameterized queries. These are SQL statements that are sent to
 	//and parsed by the database server separately from any parameters. This way it is 
-	//impossible for an attacker to inject malicious SQL.
+	//impossible for an attacker to inject malicious SQL
 	$result = pg_prepare($conn,"my_query","SELECT * from users // using
 	    WHERE login='".$user."'
 	    AND password='".$pass."'");
