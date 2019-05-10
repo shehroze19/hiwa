@@ -2,13 +2,12 @@
 require 'config.phplib';
 
 $msg="";
-if (!array_key_exists('hiwa-user', $_COOKIE) ||
-    !array_key_exists('hiwa-role', $_COOKIE)) {
+if (!isset($_SESSION['hiwa-user'])) || (!isset($_SESSION['hiwa-role'])) {
 	Header("Location: login.php");
 	exit();
 }
 
-$role=$_COOKIE['hiwa-role'];
+$role=$_SESSION['hiwa-role'];
 if ($role != 'admin') Header("Location: menu.php");
 ?>
 <html>
@@ -19,14 +18,17 @@ if ($role != 'admin') Header("Location: menu.php");
 
 <body>
 <?php require 'header.php';
-
+// adding filter to check if the ip is right and ipv4 as well
+$ip=$_REQUEST[ip];
 if (array_key_exists("ip", $_REQUEST)) {
-	echo "<P>pinging target IP address</P>";
-	exec("ping -c 3 $_REQUEST[ip]", $out);
-	echo "<div><pre>\r\n";
-	echo implode("\r\n", $out)."\r\n";
-	echo "</pre></div>";
-}
+	if(filter_var($ip, FILTER_VALIDATE_IP,FILTER_FLAG_IPV4)){
+		echo "<P>pinging target IP address</P>";
+		exec("ping -c 3 $ip", $out);
+		echo "<div><pre>\r\n";
+		echo implode("\r\n", $out)."\r\n";
+		echo "</pre></div>";}
+	else{	echo("<div>Invalid IP Address!</div>");
+	}
 ?>
 
 <form>
