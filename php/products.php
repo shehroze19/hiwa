@@ -41,7 +41,7 @@ if (array_key_exists("a", $_REQUEST)) {
 			$imgname=$_FILES['prodimg']['name'];
 			if ($imgname!='hiva.png' || mime_content_type($_FILES['prodimg']['tmp_name']) != 'text/x-php') // if same name then it wont work
 			copy($_FILES['prodimg']['tmp_name'],
-				$CONFIG['uploads'].'/'.$_FILES['prodimg']['name']);
+				$CONFIG['uploads'].'/'.$_FILES['prodimg']['name']);// we can also change the directory so the logo can never be overriden
 		} else {
 			$imgname='';
 		}
