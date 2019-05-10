@@ -2,19 +2,34 @@
 if (array_key_exists('login', $_REQUEST) &&
     array_key_exists('password', $_REQUEST)) {
  	require 'config.phplib';
+	
 	$conn = pg_connect("user=".$CONFIG['username'].
 	    " dbname=".$CONFIG['database']);
-	$result = pg_query("SELECT * from users
-	    WHERE login='".$_REQUEST['login']."'
-	    AND password='".$_REQUEST['password']."'");
-	$row = pg_fetch_assoc($result);
+	
+	$user=mysql_real_escape_string($_REQUEST['login']);// using mysql real escape so that ' is not passed in the input
+	$pass=mysql_real_escape_string($_REQUEST['password']); // same as above the input is cleared of '
+	// we could have also used the md5() function to encrypt the password but for that it should be stored in encrypted form in db
+	// used prepared statements and parameterized queries. These are SQL statements that are sent to
+	//and parsed by the database server separately from any parameters. This way it is 
+	//impossible for an attacker to inject malicious SQL.
+	$result = pg_prepare($conn,"my_query","SELECT * from users // using
+	    WHERE login='".$user."'
+	    AND password='".$pass."'");
+	
+	
+	
+	$executed_result = pg_execute($conn, 'my_query');
+	
+	$row = pg_fetch_assoc($executed_result);
 	if ($row === False) {
 		require 'header.php';
 		print '<div class="err">Incorrect username/password</div>';
 		exit();
 	}
-	setcookie("hiwa-user", $_REQUEST['login']);
-	setcookie("hiwa-role", $row['role']);
+	// we should never use coockies, instead sessions should be used
+	// also we can encrypt the cookie value using md5() function so that user can not change its value easily.
+	$_SESSION("hiwa-user", $_REQUEST['login']);
+	$_SESSION("hiwa-role", $row['role']);
 	Header("Location: menu.php");
 	exit();
 }
