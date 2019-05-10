@@ -2,21 +2,21 @@
 require 'config.phplib';
 
 $msg="";
-if (!array_key_exists('hiwa-user', $_COOKIE) ||
-    !array_key_exists('hiwa-role', $_COOKIE)) {
+if (!isset($_SESSION['hiwa-user'])) || (!isset($_SESSION['hiwa-role'])) {
 	Header("Location: login.php");
 	exit();
 }
 
-$role=$_COOKIE['hiwa-role'];
+$role=$_SESSION['hiwa-role'];
 
 if (array_key_exists('action', $_REQUEST) &&
     array_key_exists('custid', $_REQUEST) &&
     $_REQUEST['action'] == 'delete') {
 	$conn = pg_connect('user='.$CONFIG['username'].
 		' dbname='.$CONFIG['database']);
-	$res = pg_query($conn, "DELETE FROM customers WHERE 
+	$res = pg_prepare($conn,"delete_query" "DELETE FROM customers WHERE 
 		customerid='".$_REQUEST['custid']."'");
+	$res = pg_execute($conn, "delete_query")
 	if ($res === False) {
 		$msg = "Unable to remove customer";
 	}
@@ -29,13 +29,14 @@ else if (array_key_exists('custid', $_REQUEST) &&
 
 	$conn = pg_connect('user='.$CONFIG['username'].
 		' dbname='.$CONFIG['database']);
-	$res = pg_query($conn, "INSERT INTO customers
+	$res = pg_prepare($conn,"insert_query" "INSERT INTO customers
 		(customerid, customername, creditlimit, taxid)
 		VALUES
 		('".$_REQUEST['custid']."', '".
 		$_REQUEST['custname']."', ".
 		$_REQUEST['limit'].", '".
 		$_REQUEST['taxid']."')");
+		$res = pg_execute($conn, "insert_query")
 	if ($res === False) {
 		$msg="Unable to create customer.";
 	}
@@ -51,7 +52,7 @@ else if (array_key_exists('custid', $_REQUEST) &&
 <body>
 <?php require 'header.php';?>
 <div class="title">HIWA Manage Customers</div>
-<div class="subtitle">Logged in as <?php echo $_COOKIE['hiwa-user'];?>
+<div class="subtitle">Logged in as <?php echo $_SESSION['hiwa-user'];?>
 	(<?php echo $role; ?>)
 </div>
 
