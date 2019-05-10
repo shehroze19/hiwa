@@ -20,12 +20,14 @@ if (array_key_exists("username", $_POST)) {
 			exit();
 		}
 	}
-
-	$query = "select role from users where login='$_POST[username]'";
+	$username=mysql_real_escape_string(htmlentities($_POST[username])); // securing the username for eliminating xss and blind query injection
+	$query = "select role from users where login='$username' LIMIT 1"; // making sure there is 1 result just to be sure
 	$conn = pg_connect('user='.$CONFIG['username'].
 		' dbname='.$CONFIG['database']);
-	$res = pg_query($conn, $query);
-	if (pg_num_rows($res) == 1) {
+	$res = pg_prepare($conn, "result_query", $query); // using prepare
+	$executed_result = pg_execute($conn, 'result_query');
+	
+	if (pg_num_rows($executed_result) == 1) {
 		print('<P>By continuing this process, you will reset the password of <span style="font-weight:bold">'.
 			$_POST['username'].'</span>.</p>');
 		print("<p>To continue, check the box and hit the Submit button.</p>");
